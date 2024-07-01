@@ -31,4 +31,7 @@ class Settings(BaseSettings):
     environment: str
     version: str
 
+    json_schema: str
+    dto_schema: str
+
     model_config = SettingsConfigDict(env_file="config.env")
