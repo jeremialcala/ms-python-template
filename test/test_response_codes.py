@@ -14,4 +14,5 @@ def test_response_codes():
     assert ResponseCodes.UPD.value == 202
     assert ResponseCodes.NOK.value == 400
     assert ResponseCodes.FOR.value == 403
+    assert ResponseCodes.NOF.value == 404
     assert ResponseCodes.ERR.value == 500

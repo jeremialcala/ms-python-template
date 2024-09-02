@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-    This are general utillities for this project
+    This is general utilities for this project
 """
 
 
 def documenting_parameter(*sub):
     """
         This method only replace a value of another functions
-         docustring.
+         docstring.
     :param sub:
     :return:
     """

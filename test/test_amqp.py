@@ -39,15 +39,17 @@ def test_execute_operation():
         mock_channel = MagicMock()
         mock_connection.return_value.channel.return_value = mock_channel
         execute_operation(
-            connection=mock_connection,
-            channel=mock_connection.channel(),
-            header_frame={},
-            delivery_tag=0,
-            body=json.dumps(
+           mock_connection,
+           mock_connection.channel(),
+           {},
+            0,
+            json.dumps(
                 {
                     "client_id": "971ad8f0-362b-11ef-8905-9b6d06b6f8cd",
                     "resource": "user",
                     "operation": "POST",
+                    "messageId": "dbc09d10-68ca-11ef-b1cd-afa401cd546c",
+                    "destination": "dd68ebb8-68ca-11ef-a63e-13d0432d05b8",
                     "origen": "a49c75ce-362b-11ef-9ae4-97debd42cf94",
                     "body": "eyJmaXJzdE5hbWUiOiAiVGltb3RoeSIsICJtaWRkbGVOYW1lIjogIkxhdXJlbiIsI"
                             "CJsYXN0TmFtZSI6ICJFc3BhcnphIiwgImVtYWlsQWRkcmVzcyI6ICJ0ZXNwYXJ6YUB"

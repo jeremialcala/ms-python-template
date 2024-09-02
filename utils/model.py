@@ -152,12 +152,14 @@ def resource_from_model(_model: Document, _criteria: dict):
     return _resource if len(_resource) > 1 else _resource[-1]
 
 
-def validate_criteria(_data: dict, _criteria: dict):
+def validate_criteria(_data: dict, _criteria: dict) -> bool:
     """
+        This is a search of a criteria send on a dict another dict data,
+        will return True if the full criteria match.
 
     :param _data:
     :param _criteria:
     :return:
     """
-    return all(item in (_data.item() for _data_item in _data.items()) for item in
-               (_criteria_item for _criteria_item in _criteria.items()))
+    return all(item in (_data_item for _data_item in _data.items())
+               for item in  (_criteria_item for _criteria_item in _criteria.items()))

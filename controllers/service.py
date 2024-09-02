@@ -8,8 +8,6 @@ import logging.config
 from functools import wraps
 from inspect import currentframe
 
-from pydantic import BaseModel
-
 from classes import Settings
 from constants import STARTING_AT, ENDING_AT, OPERATION_DATA
 from constants import operations
@@ -38,13 +36,8 @@ def service_lifecycle(func):
 
         """
         log.info(STARTING_AT, currentframe().f_code.co_name)
-
-        message = json.loads(args[-1].decode("utf-8"))
-        log.info(message["jwe_body"]["message"]["messages"])
-
         dto = create_dynamic_dto_model("message", json.loads(_set.dto_message))
         message = dto(**json.loads(args[-1].decode("utf-8")))
-
         log.info(message.body)
 
         match message.operation:
@@ -67,45 +60,10 @@ def service_lifecycle(func):
                 pass
 
         data = {"response_code": 200, "message": "Process OK"}
+        # def execute_operation(connection, channel, header_frame, delivery_tag, body):
         rags = (args[0], args[1], args[2], args[3], data)
         log.info(ENDING_AT, currentframe().f_code.co_name)
         return func(*rags, **kwargs)
 
     log.info(ENDING_AT, currentframe().f_code.co_name)
     return wrapper
-
-
-def create_resource(body: BaseModel):
-    """
-
-    :param body:
-    :return:
-    """
-    pass
-
-
-def get_resource(criteria: dict):
-    """
-
-    :param criteria:
-    :return:
-    """
-    pass
-
-
-def update_resource(body: BaseModel):
-    """
-
-    :param body:
-    :return:
-    """
-    pass
-
-
-def delete_resource(_uuid: str):
-    """
-
-    :param _uuid:
-    :return:
-    """
-    pass
