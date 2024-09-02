@@ -3,14 +3,17 @@
     This controller handles the service data lifecycle.
 
 """
-import logging.config
 import json
-from inspect import currentframe
+import logging.config
 from functools import wraps
+from inspect import currentframe
 
-from classes import Settings, EventTransport
-from constants import STARTING_AT, ENDING_AT
-from utils import configure_logging
+from pydantic import BaseModel
+
+from classes import Settings
+from constants import STARTING_AT, ENDING_AT, OPERATION_DATA
+from constants import operations
+from utils import (configure_logging, create_dynamic_dto_model)
 
 _set = Settings()
 log = logging.getLogger(__name__)
@@ -32,16 +35,77 @@ def service_lifecycle(func):
 
             TODO: Create the security module to deserialize a JWE message
             TODO: Separate all operation on different methods and use match to execute here
-        :return:
+
         """
         log.info(STARTING_AT, currentframe().f_code.co_name)
-        log.info(kwargs)
-        if len(args) != 0:
-            event = EventTransport(**json.loads(bytes.decode(args[3], "UTF-8")))
-            log.info(event.body)
 
+        message = json.loads(args[-1].decode("utf-8"))
+        log.info(message["jwe_body"]["message"]["messages"])
+
+        dto = create_dynamic_dto_model("message", json.loads(_set.dto_message))
+        message = dto(**json.loads(args[-1].decode("utf-8")))
+
+        log.info(message.body)
+
+        match message.operation:
+            case operations.GET:
+                log.info(OPERATION_DATA, message.operation, message.messageId)
+
+            case operations.POST:
+                log.info(OPERATION_DATA, message.operation, message.messageId)
+
+            case operations.PUT:
+                log.info(OPERATION_DATA, message.operation, message.messageId)
+
+            case operations.PATCH:
+                log.info(OPERATION_DATA, message.operation, message.messageId)
+
+            case operations.DELETE:
+                log.info(OPERATION_DATA, message.operation, message.messageId)
+
+            case _:
+                pass
+
+        data = {"response_code": 200, "message": "Process OK"}
+        rags = (args[0], args[1], args[2], args[3], data)
         log.info(ENDING_AT, currentframe().f_code.co_name)
-        return func(*args, **kwargs)
+        return func(*rags, **kwargs)
 
     log.info(ENDING_AT, currentframe().f_code.co_name)
     return wrapper
+
+
+def create_resource(body: BaseModel):
+    """
+
+    :param body:
+    :return:
+    """
+    pass
+
+
+def get_resource(criteria: dict):
+    """
+
+    :param criteria:
+    :return:
+    """
+    pass
+
+
+def update_resource(body: BaseModel):
+    """
+
+    :param body:
+    :return:
+    """
+    pass
+
+
+def delete_resource(_uuid: str):
+    """
+
+    :param _uuid:
+    :return:
+    """
+    pass

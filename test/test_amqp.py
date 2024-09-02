@@ -41,6 +41,7 @@ def test_execute_operation():
         execute_operation(
             connection=mock_connection,
             channel=mock_connection.channel(),
+            header_frame={},
             delivery_tag=0,
             body=json.dumps(
                 {

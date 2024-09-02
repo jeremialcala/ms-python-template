@@ -21,4 +21,5 @@ class ResponseCodes(Enum):
     UPD = 202
     NOK = 400
     FOR = 403
+    NOF = 404
     ERR = 500

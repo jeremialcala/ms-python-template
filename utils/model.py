@@ -4,7 +4,11 @@
 
 """
 
-import jsonschema
+from uuid import uuid4
+from datetime import datetime
+import json
+from typing import Annotated
+from pydantic import Field, create_model
 from mongoengine import (
     Document,
     StringField,
@@ -16,11 +20,7 @@ from mongoengine import (
     EnumField,
     ImageField
 )
-from uuid import uuid4
-from pydantic import Field, create_model
-from bson import ObjectId
-from datetime import datetime
-from typing import Annotated
+
 from enums import Status
 import constants
 
@@ -34,11 +34,23 @@ TYPES = {
         'number': float,
     }
 
+FIELDS = {
+    constants.STRING_FIELD: StringField,
+    constants.INT_FIELD: IntField,
+    constants.OBJECT_ID_FIELD: ObjectIdField,
+    constants.UUID_FIELD: UUIDField,
+    constants.EMAIL_FIELD: EmailField,
+    constants.DATE_TIME_FIELD: DateTimeField,
+    constants.IMAGE_FIELD: EmailField,
+    constants.ENUM_FIELD: EnumField,
+}
+
 
 def generate_properties(json_schema: dict) -> dict:
     """
         Using a json file with the document schema
         return a properties for a new dynamic model
+
     :param json_schema: a plain dict with the schema description
     :return: a dict with all field of the dynamic model
     """
@@ -51,6 +63,7 @@ def generate_properties(json_schema: dict) -> dict:
                     unique=v["unique"],
                     default=uuid4()
                 )
+
             case constants.STRING_FIELD:
                 _model[k] = StringField(
                     required=v["required"],
@@ -100,7 +113,7 @@ def generate_properties(json_schema: dict) -> dict:
     return _model
 
 
-def create_dynamic_orm_model(name: str, properties: dict):
+def create_dynamic_orm_model(name: str, properties: dict) -> Document:
     """
         This method will create and return a new dynamic model
     :param name: The name of this model
@@ -125,3 +138,26 @@ def create_dynamic_dto_model(name: str, properties: dict):
         ]
 
     return create_model(name, **_model)
+
+
+def resource_from_model(_model: Document, _criteria: dict):
+    """
+
+    :param _model:
+    :param _criteria:
+    :return:
+    """
+    _resource = [resource for resource in list(_model.objects())
+                 if validate_criteria(_data=json.loads(resource.to_json()), _criteria=_criteria)]
+    return _resource if len(_resource) > 1 else _resource[-1]
+
+
+def validate_criteria(_data: dict, _criteria: dict):
+    """
+
+    :param _data:
+    :param _criteria:
+    :return:
+    """
+    return all(item in (_data.item() for _data_item in _data.items()) for item in
+               (_criteria_item for _criteria_item in _criteria.items()))

@@ -9,4 +9,6 @@
 from .tool_settings import Settings
 
 # DTOs
-from .dto_event import EventTransport
+
+
+# Entities

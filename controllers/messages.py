@@ -26,15 +26,18 @@ def process_messages(queue: str = _set.queue_name,
 
     """
     log.info(STARTING_AT, currentframe().f_code.co_name)
-
-    connection = pika.BlockingConnection(connection_parameters)
-    channel = connection.channel()
-    channel.queue_declare(queue=queue, auto_delete=False, durable=True)
-    channel.queue_bind(queue=queue,
-                       exchange=_set.amqp_exchange,
-                       routing_key=_set.amqp_routing_key)
     threads = []
+    connection = pika.BlockingConnection(connection_parameters)
+
+    channel = connection.channel()
+    channel.queue_declare(queue=queue, auto_delete=False, durable=False)
+    channel.queue_bind(
+        queue=queue,
+        exchange=_set.amqp_exchange,
+        routing_key=_set.amqp_routing_key
+    )
     channel.basic_qos(prefetch_count=1)
+
     on_message_callback = functools.partial(on_message,
                                             args=(connection, threads))
 

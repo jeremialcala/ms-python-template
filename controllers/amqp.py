@@ -52,7 +52,7 @@ def on_message(channel: Channel, method_frame: any,
     (_connection, _threads) = args
     t = threading.Thread(
         target=execute_operation,
-        args=(_connection, channel, method_frame.delivery_tag, body)
+        args=(_connection, channel, header_frame, method_frame.delivery_tag, body)
     )
     t.start()
     _threads.append(t)
@@ -61,7 +61,7 @@ def on_message(channel: Channel, method_frame: any,
 
 
 @service_lifecycle
-def execute_operation(connection, channel, delivery_tag, body):
+def execute_operation(connection, channel, header_frame, delivery_tag, body):
     """
         this executes work on a thread and after marks ACK the message.
 
@@ -71,6 +71,7 @@ def execute_operation(connection, channel, delivery_tag, body):
 
     log.info('Thread id: %s Delivery tag: %s Message body: %s',
              thread_id, delivery_tag, body)
+    log.info(header_frame)
 
     cb = functools.partial(ack_message, channel, delivery_tag)
     connection.add_callback_threadsafe(cb)
@@ -100,6 +101,18 @@ def send_message_to_queue(queue: str, routing_key: str, message,
     """
     log.info(STARTING_AT, currentframe().f_code.co_name)
     connection = pika.BlockingConnection(connection_parameters)
+
+    # BasicProperties(
+    #   [
+    #       'delivery_mode=1',
+    #       "headers=
+    #           {
+    #               'x-client-id': '21d738de-37b3-11ef-b696-2ba58bd1086f',
+    #               'x-message-id': '5b9b6a36-37b3-11ef-b236-475a3364da4d'
+    #           }"
+    #   ]
+    # ) >
+
     channel = connection.channel()
     channel.queue_declare(queue=queue)
     channel.basic_publish(exchange=_set.amqp_exchange,

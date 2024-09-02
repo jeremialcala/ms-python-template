@@ -8,6 +8,8 @@ class Settings(BaseSettings):
     """
         Each variable of this class represents a variable on a file config.env
     """
+    national_id_url: str
+    service_name: str
     db_name: str
     db_host: str
     db_username: str
@@ -31,7 +33,9 @@ class Settings(BaseSettings):
     environment: str
     version: str
 
-    json_schema: str
+    entity_schema: str
+    entity_jwk: str
     dto_schema: str
+    dto_message: str
 
-    model_config = SettingsConfigDict(env_file="config.env")
+    model_config = SettingsConfigDict(env_file="./config.env")
